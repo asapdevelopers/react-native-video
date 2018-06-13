@@ -20,6 +20,8 @@ static NSString *const timedMetadata = @"timedMetadata";
   AVPlayerLayer *_playerLayer;
   AVPlayerViewController *_playerViewController;
   NSURL *_videoURL;
+  BOOL _autoRotate;
+  NSString * _fullScreenOrientation;
 
   /* Required to publish events */
   RCTEventDispatcher *_eventDispatcher;
@@ -49,6 +51,7 @@ static NSString *const timedMetadata = @"timedMetadata";
   NSString * _resizeMode;
   BOOL _fullscreenPlayerPresented;
   UIViewController * _presentingViewController;
+    
 }
 
 - (instancetype)initWithEventDispatcher:(RCTEventDispatcher *)eventDispatcher
@@ -71,6 +74,8 @@ static NSString *const timedMetadata = @"timedMetadata";
     _allowsExternalPlayback = YES;
     _playWhenInactive = false;
     _ignoreSilentSwitch = @"inherit"; // inherit, ignore, obey
+    _autoRotate = YES;
+    _fullScreenOrientation = @"all";
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationWillResignActive:)
@@ -611,6 +616,16 @@ static NSString *const timedMetadata = @"timedMetadata";
   }
 }
 
+- (void)setAutoRotate:(BOOL)autoRotate
+{
+        _autoRotate = autoRotate;
+    }
+
+- (void)setFullScreenOrientation:(NSString *)fullScreenOrientation
+{
+        _fullScreenOrientation = fullScreenOrientation;
+}
+
 - (void)setRate:(float)rate
 {
   _rate = rate;
@@ -625,30 +640,34 @@ static NSString *const timedMetadata = @"timedMetadata";
 
 - (void)setVolume:(float)volume
 {
-  _volume = volume;
-  [self applyModifiers];
+    _volume = volume;
+    [self applyModifiers];
 }
 
 - (void)applyModifiers
 {
-  if (_muted) {
-    [_player setVolume:0];
-    [_player setMuted:YES];
-  } else {
-    [_player setVolume:_volume];
-    [_player setMuted:NO];
-  }
-
-  [self setSelectedTextTrack:_selectedTextTrack];
-  [self setResizeMode:_resizeMode];
-  [self setRepeat:_repeat];
-  [self setPaused:_paused];
-  [self setControls:_controls];
-  [self setAllowsExternalPlayback:_allowsExternalPlayback];
+    if (_muted) {
+        [_player setVolume:0];
+        [_player setMuted:YES];
+        ((RCTVideoPlayerViewController *) _playerViewController).autoRotate = _autoRotate;
+#if !TARGET_OS_TV
+        ((RCTVideoPlayerViewController *) _playerViewController).fullScreenOrientation = [self getFullScreenOrientation];
+#endif
+    } else {
+        [_player setVolume:_volume];
+        [_player setMuted:NO];
+    }
+    
+    [self setSelectedTextTrack:_selectedTextTrack];
+    [self setResizeMode:_resizeMode];
+    [self setRepeat:_repeat];
+    [self setPaused:_paused];
+    [self setControls:_controls];
+    [self setAllowsExternalPlayback:_allowsExternalPlayback];
 }
 
 - (void)setRepeat:(BOOL)repeat {
-  _repeat = repeat;
+    _repeat = repeat;
 }
 
 - (void)setSelectedTextTrack:(NSDictionary *)selectedTextTrack {
@@ -690,7 +709,7 @@ static NSString *const timedMetadata = @"timedMetadata";
     [_player.currentItem selectMediaOptionAutomaticallyInMediaSelectionGroup:group];
     return;
   }
-  
+
   // If a match isn't found, option will be nil and text tracks will be disabled
   [_player.currentItem selectMediaOption:option inMediaSelectionGroup:group];
 }
@@ -832,6 +851,40 @@ static NSString *const timedMetadata = @"timedMetadata";
     [_playerLayer removeObserver:self forKeyPath:readyForDisplayKeyPath];
     _playerLayer = nil;
 }
+
+#if !TARGET_OS_TV
+- (UIInterfaceOrientationMask)getFullScreenOrientation
+{
+        UIInterfaceOrientationMask orientation = UIInterfaceOrientationMaskAll;
+        if ([_fullScreenOrientation isEqualToString:@"portrait"])
+            {
+                    orientation = UIInterfaceOrientationMaskPortrait;
+                }
+        else if ([_fullScreenOrientation isEqualToString:@"portraitUpsideDown"])
+            {
+                    orientation = UIInterfaceOrientationMaskPortraitUpsideDown;
+                }
+        else if ([_fullScreenOrientation isEqualToString:@"landscape"])
+           {
+                    orientation = UIInterfaceOrientationMaskLandscape;
+                }
+        else if ([_fullScreenOrientation isEqualToString:@"landscapeLeft"])
+            {
+                    orientation = UIInterfaceOrientationMaskLandscapeLeft;
+               }
+        else if ([_fullScreenOrientation isEqualToString:@"landscapeRight"])
+            {
+                    orientation = UIInterfaceOrientationMaskLandscapeRight;
+                }
+        else if ([_fullScreenOrientation isEqualToString:@"allButUpsideDown"])
+            {
+                    orientation = UIInterfaceOrientationMaskAllButUpsideDown;
+                }
+    
+        return orientation;
+    }
+#endif
+
 
 #pragma mark - RCTVideoPlayerViewControllerDelegate
 

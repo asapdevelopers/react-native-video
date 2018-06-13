@@ -1,3 +1,9 @@
+## About this project
+
+This project was forked from https://github.com/react-native-community/react-native-video
+It adds autoRoation for ios
+
+
 ## react-native-video
 
 A `<Video>` component for react-native, as seen in
@@ -48,7 +54,7 @@ Note: you can also use the `ignoreSilentSwitch` prop, shown below.
 
 <details>
   <summary>tvOS</summary>
-  
+
 Run `react-native link` to link the react-native-video library.
 
 `react-native link` don’t works properly with the tvOS target so we need to add the library manually.
@@ -193,6 +199,8 @@ using System.Collections.Generic;
        onFullscreenPlayerDidDismiss={this.fullScreenPlayerDidDismiss}  // Callback after fullscreen stopped
        onProgress={this.setTime}               // Callback every ~250ms with currentTime
        onTimedMetadata={this.onTimedMetadata}  // Callback when the stream receive some metadata
+       autoRotate={false}                      // [iOS] Determines if FullScreenPlayer can be rotated (default true).
+       fullScreenOrientation={Video.Constants.landscape}
        style={styles.backgroundVideo} />
 
 // Later to trigger fullscreen
@@ -311,7 +319,7 @@ Default: 250.0
 Platforms: all
 
 ### rate
-Speed at which the media should play. 
+Speed at which the media should play.
 * **0.0** - Pauses the video
 * **1.0** - Play at normal speed
 * **Other values** - Slow down or speed up playback
@@ -362,7 +370,7 @@ Type | Value | Description
 "language" | string | Display the text track with the language specified as the Value, e.g. "fr"
 "index" | number | Display the text track with the index specified as the value, e.g. 0
 
-Both iOS & Android (only 4.4 and higher) offer Settings to enable Captions for hearing impaired people. If "system" is selected and the Captions Setting is enabled, iOS/Android will look for a caption that matches that customer's language and display it. 
+Both iOS & Android (only 4.4 and higher) offer Settings to enable Captions for hearing impaired people. If "system" is selected and the Captions Setting is enabled, iOS/Android will look for a caption that matches that customer's language and display it.
 
 If a track matching the specified Type (and Value if appropriate) is unavailable, no text track will be displayed. If multiple tracks match the criteria, the first match will be used.
 
@@ -446,7 +454,7 @@ textTracks | array | An array of text track info objects with the following prop
 
 Example:
 ```
-{ 
+{
   canPlaySlowForward: true,
   canPlayReverse: false,
   canPlaySlowReverse: false,
