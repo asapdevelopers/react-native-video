@@ -48,7 +48,7 @@ Note: you can also use the `ignoreSilentSwitch` prop, shown below.
 
 <details>
   <summary>tvOS</summary>
-  
+
 Run `react-native link` to link the react-native-video library.
 
 `react-native link` don’t works properly with the tvOS target so we need to add the library manually.
@@ -189,6 +189,8 @@ using System.Collections.Generic;
        onBuffer={this.onBuffer}                // Callback when remote video is buffering
        onEnd={this.onEnd}                      // Callback when playback finishes
        onError={this.videoError}               // Callback when video cannot be loaded
+       autoRotate={false}                      // [iOS] Determines if FullScreenPlayer can be rotated (default true).
+       fullScreenOrientation={Video.Constants.landscape}
        onFullscreenPlayerWillPresent={this.fullScreenPlayerWillPresent} // Callback before fullscreen starts
        onFullscreenPlayerDidPresent={this.fullScreenPlayerDidPresent}   // Callback after fullscreen started
        onFullscreenPlayerWillDismiss={this.fullScreenPlayerWillDismiss} // Callback before fullscreen stops
@@ -282,7 +284,7 @@ Default: 250.0.
 Platforms: all
 
 #### rate
-Speed at which the media should play. 
+Speed at which the media should play.
 * **0.0** - Pauses the video
 * **1.0** - Play at normal speed
 * **Other values** - Slow down or speed up playback
